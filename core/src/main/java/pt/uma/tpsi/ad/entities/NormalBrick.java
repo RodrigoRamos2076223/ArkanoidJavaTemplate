@@ -17,6 +17,6 @@ public class NormalBrick extends Brick {
     }
 
     @Override
-    public int getPoints() { return 10; }
+    public int getPoints() { return 100; }
 
 }

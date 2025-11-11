@@ -18,5 +18,5 @@ public class PowerUpBrick extends Brick {
     }
 
     @Override
-    public int getPoints() { return 15; }
+    public int getPoints() { return 150; }
 }
