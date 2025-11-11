@@ -17,9 +17,6 @@ public class Animator {
     private String path;
     private int width, height;
 
-    // store frames so we can draw a specific one when needed
-    private TextureRegion[] frames;
-
     // A variable for tracking elapsed time for the animation
     float stateTime;
 
@@ -54,11 +51,8 @@ public class Animator {
             }
         }
 
-        // save frames for direct access
-        this.frames = walkFrames;
-
         // Initialize the Animation with the frame interval and array of frames
-        walkAnimation = new Animation<TextureRegion>(0.095f, walkFrames);
+        walkAnimation = new Animation<>(0.095f, walkFrames);
         // time to 0
         stateTime = 0f;
     }
@@ -76,18 +70,6 @@ public class Animator {
         stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
         spriteBatch.draw(currentFrame, posX, posY, drawWidth, drawHeight);
-    }
-
-    // Render a specific frame index (useful to show damage states instead of animating)
-    public void renderFrame(int posX, int posY, int drawWidth, int drawHeight, int frameIndex) {
-        if (frames == null || frames.length == 0) {
-            // fallback to normal render
-            render(posX, posY, drawWidth, drawHeight);
-            return;
-        }
-        int idx = Math.max(0, frameIndex) % frames.length;
-        TextureRegion frame = frames[idx];
-        spriteBatch.draw(frame, posX, posY, drawWidth, drawHeight);
     }
 
 

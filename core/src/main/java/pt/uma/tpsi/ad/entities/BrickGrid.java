@@ -11,7 +11,9 @@ public class BrickGrid {
 
     private final List<Brick> bricks;
     private final List<Explosion> explosions;
+    private final List<PowerUp> powerUps;
     private final SpriteBatch batch;
+    private int score = 0; // contador simples de pontos
 
     private static final int ROWS = 4;
     private static final int COLS = 20;
@@ -20,6 +22,7 @@ public class BrickGrid {
         this.batch = batch;
         this.bricks = new ArrayList<>();
         this.explosions = new ArrayList<>();
+        this.powerUps = new ArrayList<>();
         createBricks();
     }
 
@@ -65,7 +68,8 @@ public class BrickGrid {
     }
 
     /** Atualiza colisões e explosões */
-    public void update(float delta, Ball ball) {
+    // Nota: recebe Player para processar colisões com powerups
+    public void update(float delta, Ball ball, Player player) {
         // Checa colisões entre bola e bricks usando um ciclo indexado (reverse) para permitir remoção
         for (int i = bricks.size() - 1; i >= 0; i--) {
             Brick brick = bricks.get(i);
@@ -76,17 +80,31 @@ public class BrickGrid {
                 // inverte a direção da bola uma vez por colisão
                 ball.reverseYDirection();
                 // empurra a bola para fora do brick para evitar colisões repetidas
-                ball.resolveCollisionWith(brick.getBoundingBox());
 
                 // se o brick foi destruído com este impacto, cria explosão e remove o brick
                 if (brick.isCollided()) {
+                    // incrementa pontuação conforme o tipo de brick
+                    score += brick.getPoints();
+
                     int explosionX = brick.getPosX();
                     int explosionY = brick.getPosY();
                     int w = (int) brick.getBoundingBox().width;
                     int h = (int) brick.getBoundingBox().height;
                     explosions.add(new Explosion(batch, explosionX, explosionY, w, h));
+
+                    // se for PowerUpBrick, cria um PowerUp a cair
+                    if (brick instanceof PowerUpBrick) {
+                        PowerUp.Type[] vals = PowerUp.Type.values();
+                        PowerUp.Type t = vals[(int) (Math.random() * vals.length)];
+                        PowerUp pu = new PowerUp(batch, brick.getPosX(), brick.getPosY(), t);
+                        powerUps.add(pu);
+                    }
+
                     bricks.remove(i);
                 }
+
+                // processa apenas a primeira colisão desta frame.
+                break;
             }
         }
 
@@ -97,6 +115,22 @@ public class BrickGrid {
 
         // Remove explosões concluídas
         explosions.removeIf(Explosion::shouldRemove);
+
+        // Atualiza powerups e checa colisão com o player
+        for (PowerUp pu : powerUps) {
+            pu.update(delta);
+            if (pu.getBoundingBox().overlaps(player.getBoundingBox())) {
+                 if (pu.getType() == PowerUp.Type.FAST_PADDLE) {
+                    player.increaseSpeed();
+                } else if (pu.getType() == PowerUp.Type.FAST_BALL) {
+                    ball.increaseSpeedY();
+                }
+                pu.markForRemove();
+            }
+        }
+
+        // Remove powerups que caíram ou foram apanhados
+        powerUps.removeIf(PowerUp::shouldRemove);
     }
 
     /** Renderiza bricks e explosões */
@@ -112,13 +146,13 @@ public class BrickGrid {
         for (Explosion e : explosions) {
             e.render();
         }
+
+        // Renderiza powerups
+        for (PowerUp pu : powerUps) {
+            pu.render();
+        }
     }
 
-    public List<Brick> getBricks() {
-        return bricks;
-    }
-
-    public List<Explosion> getExplosions() {
-        return explosions;
-    }
+    // Retorna a pontuação atual
+    public int getScore() { return score; }
 }

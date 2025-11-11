@@ -9,7 +9,7 @@ public class Explosion {
     private final Animator animator;
     private boolean remove = false;
     private float elapsed = 0f;
-    private final float duration = 1f; // duração em segundos
+    private final float duration = 1; // duração em segundos
 
     // agora recebe largura/altura para desenhar no lugar do brick
     public Explosion(SpriteBatch batch, int x, int y, int width, int height) {

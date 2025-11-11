@@ -6,6 +6,7 @@ public class StrongBrick extends Brick {
 
     private int lives = 2;
 
+
     public StrongBrick(SpriteBatch batch, int x, int y) {
         // usa constructor que permite indicar o spritesheet (assumido 4 colunas x 1 linha)
         super(batch, "red.png", 2, 1, x, y);
@@ -19,4 +20,7 @@ public class StrongBrick extends Brick {
         }
 
     }
+
+    @Override
+    public int getPoints() { return 20; }
 }

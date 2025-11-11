@@ -3,12 +3,8 @@ package pt.uma.tpsi.ad.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import org.w3c.dom.css.Rect;
 import pt.uma.tpsi.ad.game.Animator;
-import pt.uma.tpsi.ad.game.Game;
 import com.badlogic.gdx.math.Rectangle;
-
-import java.awt.*;
 
 public class Player {
     private Animator animator;
@@ -54,5 +50,11 @@ public class Player {
 
     public Rectangle getBoundingBox() {
         return boundingBox;
+    }
+
+
+    // Power-up: aumenta velocidade do paddle
+    public void increaseSpeed() {
+        speed = speed + 5;
     }
 }

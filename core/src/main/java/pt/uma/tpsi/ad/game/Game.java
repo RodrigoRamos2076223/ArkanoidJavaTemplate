@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import pt.uma.tpsi.ad.entities.Ball;
 import pt.uma.tpsi.ad.entities.BrickGrid;
 import pt.uma.tpsi.ad.entities.Player;
-import pt.uma.tpsi.ad.entities.Brick;
-import pt.uma.tpsi.ad.entities.Explosion;
 
 public class Game extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -23,6 +21,7 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
         Gdx.graphics.setWindowedMode(1280, 720);
+        Gdx.graphics.setForegroundFPS(60);
         batch = new SpriteBatch();
 
         backgroundManagement = new BackgroundManagement(batch);
@@ -45,7 +44,7 @@ public class Game extends ApplicationAdapter {
         ball.render();
         // Atualiza bricks/explosões e processa colisões dentro do BrickGrid
         float delta = Gdx.graphics.getDeltaTime();
-        brickGrid.update(delta, ball);
+        brickGrid.update(delta, ball, player);
         // depois desenha a grelha atualizada
         brickGrid.render();
 
@@ -69,6 +68,10 @@ public class Game extends ApplicationAdapter {
                 Gdx.graphics.getWidth() / 2f - 150,
                 Gdx.graphics.getHeight() / 2f);
         }
+
+        // Desenha pontuação no canto superior esquerdo
+        font.getData().setScale(1.2f);
+        font.draw(batch, "Score: " + brickGrid.getScore(), 10, Gdx.graphics.getHeight() - 10);
 
         batch.end();
     }
