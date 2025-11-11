@@ -12,8 +12,8 @@ public class Ball {
     private int directionX;
     private int directionY;
     private double angle;
-    private int speedX = 4; // aumenta para a bola ficar mais rápida horizontalmente
-    private int speedY = 3;
+    private int speedX = 7; // aumenta para a bola ficar mais rápida horizontalmente
+    private int speedY = 5;
 
 
     public Ball(SpriteBatch batch){
@@ -24,7 +24,7 @@ public class Ball {
         this.angle =0;
 
     }
-    // TEste
+
     public void create() {
         animator.create();
         posX = (Gdx.graphics.getWidth()/2) - this.animator.getWidth()/2;
@@ -62,6 +62,21 @@ public class Ball {
 
     public void reverseYDirection() {
         directionY *= -1;
+    }
+
+    // Empurra a bola para fora do rect fornecido para evitar deteção repetida de colisão
+    public void resolveCollisionWith(Rectangle rect) {
+        if (animator == null || boundingBox == null) return;
+        float ballCenterY = posY + animator.getHeight() / 2f;
+        float rectCenterY = rect.y + rect.height / 2f;
+        if (ballCenterY < rectCenterY) {
+            // bola estava abaixo do rect, posiciona-a abaixo
+            posY = (int) (rect.y - animator.getHeight() - 1);
+        } else {
+            // bola estava acima do rect, posiciona-a acima
+            posY = (int) (rect.y + rect.height + 1);
+        }
+        boundingBox.setPosition(posX, posY);
     }
 
     // Ajusta a direção horizontal dependendo do ponto de contacto no rect (paddle ou brick)

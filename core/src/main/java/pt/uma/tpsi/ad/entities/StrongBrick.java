@@ -17,16 +17,6 @@ public class StrongBrick extends Brick {
         if (lives <= 0) {
             collided = true;
         }
-        System.out.println("StrongBrick colidido! Vidas restantes: " + lives);
-    }
 
-    @Override
-    public void render() {
-        // se quiseres mostrar um sprite partido podes usar renderFrame(1)
-        if (lives == 1) {
-            renderFrame(1);
-        } else {
-            super.render();
-        }
     }
 }

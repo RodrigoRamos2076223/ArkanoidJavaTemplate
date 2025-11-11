@@ -11,10 +11,7 @@ public class NormalBrick extends Brick {
 
     @Override
     public void onCollision() {
-        // Marca o bloco como colidido/destroído
-        collided = true;
-        // Aqui podes adicionar lógica para pontuação, efeitos visuais, etc.
-        System.out.println("NormalBrick colidido!");
+        collided= true;
     }
 
 }

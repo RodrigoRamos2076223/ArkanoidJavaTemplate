@@ -11,7 +11,7 @@ public class IndestructibleBrick extends Brick {
 
     @Override
     public void onCollision() {
-        // Não faz nada, bloco não pode ser destruído
-        System.out.println("IndestructibleBrick colidido! Não destruído.");
+        collided=false;
+
     }
 }

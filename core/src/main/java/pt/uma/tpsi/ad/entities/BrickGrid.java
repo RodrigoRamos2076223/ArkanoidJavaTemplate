@@ -2,112 +2,123 @@ package pt.uma.tpsi.ad.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BrickGrid {
 
-    private List<Brick> bricks;
-    private SpriteBatch batch;
+    private final List<Brick> bricks;
+    private final List<Explosion> explosions;
+    private final SpriteBatch batch;
+
+    private static final int ROWS = 4;
+    private static final int COLS = 20;
 
     public BrickGrid(SpriteBatch batch) {
         this.batch = batch;
-        bricks = new ArrayList<>();
+        this.bricks = new ArrayList<>();
+        this.explosions = new ArrayList<>();
         createBricks();
     }
 
     private void createBricks() {
-        // Requerido pelo utilizador: 4 linhas x 20 colunas
-        int rows = 4;
-        int cols = 20;
+        Random rng = new Random();
 
-        // passo 1: criar instâncias com posições temporárias e inicializar dimensões
-        List<Brick> temp = new ArrayList<>();
-        for (int i = 0; i < rows * cols; i++) {
-            int type = (int) (Math.random() * 4);
-            Brick brick;
-            int x = 0, y = 0;
-            switch (type) {
-                case 0:
-                    brick = new NormalBrick(batch, x, y);
-                    break;
-                case 1:
-                    brick = new StrongBrick(batch, x, y);
-                    break;
-                case 2:
-                    brick = new IndestructibleBrick(batch, x, y);
-                    break;
-                case 3:
-                    brick = new PowerUpBrick(batch, x, y);
-                    break;
-                default:
-                    brick = new NormalBrick(batch, x, y);
-                    break;
-            }
-            brick.create();
-            temp.add(brick);
-        }
+        int brickW = 32;
+        int brickH = 16;
+        int spacingX = 20;
+        int spacingY = 13;
 
-        // Normalizar todas as dimensões para o maior width/height de todos os sprites
-        int maxW = 0;
-        int maxH = 0;
-        for (Brick b : temp) {
-            int w = (int) b.getBoundingBox().width;
-            int h = (int) b.getBoundingBox().height;
-            if (w > maxW) maxW = w;
-            if (h > maxH) maxH = h;
-        }
-        // define o tamanho padrão e atualiza bounding boxes
-        Brick.setStandardSize(maxW, maxH);
-        for (Brick b : temp) {
-            b.getBoundingBox().setSize(maxW, maxH);
-        }
+        int totalWidth = COLS * (brickW + spacingX) - spacingX;
+        int startX = (Gdx.graphics.getWidth() - totalWidth) / 2;
+        int startY = Gdx.graphics.getHeight() - 100;
 
-        // usar os valores normalizados
-        int brickW = maxW;
-        int brickH = maxH;
-
-        // Para que as colunas fiquem direitas, usamos um spacing horizontal pequeno e constante
-        int spacingX = Math.max(2, Math.round(brickW * 0.08f)); // pequeno espaço horizontal
-        int spacingY = Math.round(brickH * 0.9f);  // espaço vertical razoável
-
-        int totalWidth = cols * brickW + (cols - 1) * spacingX;
-        // Se o totalWidth for maior que a largura da janela, reduzimos um pouco spacingX
-        if (totalWidth > Gdx.graphics.getWidth()) {
-            int overflow = totalWidth - Gdx.graphics.getWidth();
-            int reducePerGap = Math.max(0, overflow / Math.max(1, cols - 1));
-            spacingX = Math.max(0, spacingX - reducePerGap);
-            totalWidth = cols * brickW + (cols - 1) * spacingX;
-        }
-
-        int startX = (int) ((Gdx.graphics.getWidth() - totalWidth) / 2f);
-        int startY = Gdx.graphics.getHeight() - 100; // distância ao topo ajustável
-
-        // passo 2: posicionar os bricks numa grelha ordenada
         bricks.clear();
-        int index = 0;
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                Brick b = temp.get(index++);
+
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS; col++) {
+                float p = rng.nextFloat();
+                Brick b;
+
+                if (p < 0.5f) {
+                    b = new NormalBrick(batch, 0, 0);
+                } else if (p < 0.8f) {
+                    b = new StrongBrick(batch, 0, 0);
+                } else if (p < 0.9f) {
+                    b = new IndestructibleBrick(batch, 0, 0);
+                } else {
+                    b = new PowerUpBrick(batch, 0, 0);
+                }
+
                 int x = startX + col * (brickW + spacingX);
                 int y = startY - row * (brickH + spacingY);
+
                 b.posX = x;
                 b.posY = y;
                 b.getBoundingBox().setPosition(x, y);
+
                 bricks.add(b);
             }
         }
     }
 
+    /** Atualiza colisões e explosões */
+    public void update(float delta, Ball ball) {
+        // Checa colisões entre bola e bricks usando um ciclo indexado (reverse) para permitir remoção
+        for (int i = bricks.size() - 1; i >= 0; i--) {
+            Brick brick = bricks.get(i);
+            if (brick.getBoundingBox().overlaps(ball.getBoundingBox())) {
+                // processa colisão
+                brick.onCollision();
+
+                // inverte a direção da bola uma vez por colisão
+                ball.reverseYDirection();
+                // empurra a bola para fora do brick para evitar colisões repetidas
+                ball.resolveCollisionWith(brick.getBoundingBox());
+
+                // se o brick foi destruído com este impacto, cria explosão e remove o brick
+                if (brick.isCollided()) {
+                    int explosionX = brick.getPosX();
+                    int explosionY = brick.getPosY();
+                    int w = (int) brick.getBoundingBox().width;
+                    int h = (int) brick.getBoundingBox().height;
+                    explosions.add(new Explosion(batch, explosionX, explosionY, w, h));
+                    bricks.remove(i);
+                }
+            }
+        }
+
+        // Atualiza explosões
+        for (Explosion e : explosions) {
+            e.update(delta);
+        }
+
+        // Remove explosões concluídas
+        explosions.removeIf(Explosion::shouldRemove);
+    }
+
+    /** Renderiza bricks e explosões */
     public void render() {
+        // Renderiza bricks ainda não destruídos
         for (Brick brick : bricks) {
             if (!brick.isCollided()) {
                 brick.render();
             }
         }
+
+        // Renderiza explosões
+        for (Explosion e : explosions) {
+            e.render();
+        }
     }
 
     public List<Brick> getBricks() {
         return bricks;
+    }
+
+    public List<Explosion> getExplosions() {
+        return explosions;
     }
 }

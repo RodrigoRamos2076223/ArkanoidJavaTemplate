@@ -8,6 +8,7 @@ import pt.uma.tpsi.ad.entities.Ball;
 import pt.uma.tpsi.ad.entities.BrickGrid;
 import pt.uma.tpsi.ad.entities.Player;
 import pt.uma.tpsi.ad.entities.Brick;
+import pt.uma.tpsi.ad.entities.Explosion;
 
 public class Game extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -42,16 +43,11 @@ public class Game extends ApplicationAdapter {
         backgroundManagement.render();
         player.render();
         ball.render();
+        // Atualiza bricks/explosões e processa colisões dentro do BrickGrid
+        float delta = Gdx.graphics.getDeltaTime();
+        brickGrid.update(delta, ball);
+        // depois desenha a grelha atualizada
         brickGrid.render();
-        // Colisões com os blocos
-        for (Brick brick : brickGrid.getBricks()) {
-            if (!brick.isCollided() && ball.getBoundingBox().overlaps(brick.getBoundingBox())) {
-                brick.onCollision();
-                ball.reverseYDirection();
-            }
-        }
-
-
 
         if (ball.getBoundingBox().overlaps(player.getBoundingBox())) {
             // ajusta direção horizontal consoante o ponto de contacto com o paddle
