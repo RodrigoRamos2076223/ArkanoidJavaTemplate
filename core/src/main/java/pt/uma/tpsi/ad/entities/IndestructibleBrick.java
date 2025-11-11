@@ -14,4 +14,9 @@ public class IndestructibleBrick extends Brick {
         collided=false;
 
     }
+
+    @Override
+    public int getPoints() {
+        return 0;
+    }
 }

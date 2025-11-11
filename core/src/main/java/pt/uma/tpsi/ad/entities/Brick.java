@@ -49,4 +49,7 @@ public abstract class Brick {
 
     // Cada tipo de brick implementa o comportamento da colisão
     public abstract void onCollision();
+
+    // Pontos ganhos ao destruir este brick (por defeito 0)
+    public int getPoints() { return 0; }
 }

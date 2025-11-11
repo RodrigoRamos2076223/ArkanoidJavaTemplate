@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import pt.uma.tpsi.ad.entities.Ball;
 import pt.uma.tpsi.ad.entities.BrickGrid;
 import pt.uma.tpsi.ad.entities.Player;
-import pt.uma.tpsi.ad.entities.Brick;
-import pt.uma.tpsi.ad.entities.Explosion;
 
 public class Game extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -19,6 +17,8 @@ public class Game extends ApplicationAdapter {
     private BrickGrid brickGrid;
 
     private boolean gameOver = false; // controla o fim do jogo
+    private boolean victory = false; // controla vitória
+
 
     @Override
     public void create() {
@@ -31,7 +31,7 @@ public class Game extends ApplicationAdapter {
 
         ball = new Ball(batch);
         ball.create();
-        brickGrid = new BrickGrid(batch);
+        brickGrid = new BrickGrid(batch, player);
 
         // 🔹 Usa a fonte padrão do LibGDX — sem precisar de ficheiros externos
         font = new BitmapFont();
@@ -55,19 +55,29 @@ public class Game extends ApplicationAdapter {
             ball.reverseYDirection(); // faz a bola “saltar” para cima
         }
 
-        // Se o jogo ainda não acabou, atualiza normalmente
+        // Se o jogo ainda não acabou, verifica condições de fim
         if (!gameOver) {
             if (ball.posY() < 0) { // se a bola sair por baixo do ecrã
                 gameOver = true;
+                victory = false;
+            } else if (brickGrid.isCleared()) { // vitória
+                gameOver = true;
+                victory = true;
             }
         }
 
-        // Se o jogo acabou, mostra o texto no ecrã
+        // Se o jogo acabou, mostra texto apropriado (vitória ou derrota)
         if (gameOver) {
             font.getData().setScale(3); // aumenta o tamanho do texto
-            font.draw(batch, "GAME OVER",
-                Gdx.graphics.getWidth() / 2f - 150,
-                Gdx.graphics.getHeight() / 2f);
+            if (victory) {
+                font.draw(batch, "YOU WIN!",
+                    Gdx.graphics.getWidth() / 2f - 150,
+                    Gdx.graphics.getHeight() / 2f);
+            } else {
+                font.draw(batch, "GAME OVER",
+                    Gdx.graphics.getWidth() / 2f - 150,
+                    Gdx.graphics.getHeight() / 2f);
+            }
         }
 
         batch.end();
@@ -77,5 +87,6 @@ public class Game extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         font.dispose();
+        if (player != null) player.dispose();
     }
 }

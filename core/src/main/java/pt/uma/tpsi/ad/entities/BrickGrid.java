@@ -12,14 +12,16 @@ public class BrickGrid {
     private final List<Brick> bricks;
     private final List<Explosion> explosions;
     private final SpriteBatch batch;
+    private final Player player; // referência para atualizar pontuação
 
     private static final int ROWS = 4;
     private static final int COLS = 20;
 
-    public BrickGrid(SpriteBatch batch) {
+    public BrickGrid(SpriteBatch batch, Player player) {
         this.batch = batch;
         this.bricks = new ArrayList<>();
         this.explosions = new ArrayList<>();
+        this.player = player;
         createBricks();
     }
 
@@ -77,7 +79,6 @@ public class BrickGrid {
                 ball.reverseYDirection();
                 // empurra a bola para fora do brick para evitar colisões repetidas
                 ball.resolveCollisionWith(brick.getBoundingBox());
-
                 // se o brick foi destruído com este impacto, cria explosão e remove o brick
                 if (brick.isCollided()) {
                     int explosionX = brick.getPosX();
@@ -85,6 +86,10 @@ public class BrickGrid {
                     int w = (int) brick.getBoundingBox().width;
                     int h = (int) brick.getBoundingBox().height;
                     explosions.add(new Explosion(batch, explosionX, explosionY, w, h));
+                    // adiciona pontos ao jogador antes de remover o brick
+                    if (player != null) {
+                        player.addScore(brick.getPoints());
+                    }
                     bricks.remove(i);
                 }
             }
@@ -120,5 +125,16 @@ public class BrickGrid {
 
     public List<Explosion> getExplosions() {
         return explosions;
+    }
+
+    /** Retorna true se todos os bricks destrutíveis foram removidos (restam apenas indestrutíveis) */
+    public boolean isCleared() {
+        for (Brick b : bricks) {
+            // se existir algum brick que não seja indestrutível e não esteja marcado como colidido
+            if (!(b instanceof IndestructibleBrick) && !b.isCollided()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

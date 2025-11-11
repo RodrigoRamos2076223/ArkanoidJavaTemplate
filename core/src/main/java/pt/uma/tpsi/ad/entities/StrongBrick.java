@@ -19,4 +19,9 @@ public class StrongBrick extends Brick {
         }
 
     }
+
+    @Override
+    public int getPoints() {
+        return 200;
+    }
 }

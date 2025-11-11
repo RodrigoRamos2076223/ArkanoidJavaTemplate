@@ -14,4 +14,9 @@ public class NormalBrick extends Brick {
         collided= true;
     }
 
+    @Override
+    public int getPoints() {
+        return 50;
+    }
+
 }
