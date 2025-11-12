@@ -10,7 +10,7 @@ public class Player {
     private Animator animator;
     private int posX, posY;
     private Rectangle boundingBox;
-    private int speed = 5;      // tornar inteiro para evitar problemas de cast
+    private int speed = 10;      // tornar inteiro para evitar problemas de cast
 
     private int width, height;  // dimensões fixas do sprite (frames)
 
@@ -53,8 +53,4 @@ public class Player {
     }
 
 
-    // Power-up: aumenta velocidade do paddle
-    public void increaseSpeed() {
-        speed = speed + 5;
-    }
 }

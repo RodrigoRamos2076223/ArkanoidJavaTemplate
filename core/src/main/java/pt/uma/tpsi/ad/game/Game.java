@@ -50,7 +50,6 @@ public class Game extends ApplicationAdapter {
 
         if (ball.getBoundingBox().overlaps(player.getBoundingBox())) {
             // ajusta direção horizontal consoante o ponto de contacto com o paddle
-            ball.adjustDirectionOnContact(player.getBoundingBox());
             ball.reverseYDirection(); // faz a bola “saltar” para cima
         }
 

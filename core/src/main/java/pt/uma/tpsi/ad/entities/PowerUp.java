@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import pt.uma.tpsi.ad.game.Animator;
 
 public class PowerUp {
-    public enum Type {FAST_PADDLE, FAST_BALL }
+    public enum Type {FAST_BALL }
 
     private final Animator animator;
     private int x, y;

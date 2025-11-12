@@ -31,8 +31,8 @@ public class BrickGrid {
 
         int brickW = 32;
         int brickH = 16;
-        int spacingX = 20;
-        int spacingY = 13;
+        int spacingX = 0;
+        int spacingY = 0;
 
         int totalWidth = COLS * (brickW + spacingX) - spacingX;
         int startX = (Gdx.graphics.getWidth() - totalWidth) / 2;
@@ -67,7 +67,6 @@ public class BrickGrid {
         }
     }
 
-    /** Atualiza colisões e explosões */
     // Nota: recebe Player para processar colisões com powerups
     public void update(float delta, Ball ball, Player player) {
         // Checa colisões entre bola e bricks usando um ciclo indexado (reverse) para permitir remoção
@@ -103,26 +102,24 @@ public class BrickGrid {
                     bricks.remove(i);
                 }
 
-                // processa apenas a primeira colisão desta frame.
+
                 break;
             }
         }
 
-        // Atualiza explosões
+
         for (Explosion e : explosions) {
             e.update(delta);
         }
 
-        // Remove explosões concluídas
+
         explosions.removeIf(Explosion::shouldRemove);
 
-        // Atualiza powerups e checa colisão com o player
+
         for (PowerUp pu : powerUps) {
             pu.update(delta);
             if (pu.getBoundingBox().overlaps(player.getBoundingBox())) {
-                 if (pu.getType() == PowerUp.Type.FAST_PADDLE) {
-                    player.increaseSpeed();
-                } else if (pu.getType() == PowerUp.Type.FAST_BALL) {
+                  if (pu.getType() == PowerUp.Type.FAST_BALL) {
                     ball.increaseSpeedY();
                 }
                 pu.markForRemove();
