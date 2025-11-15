@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -39,6 +40,12 @@ public class BrickGrid {
         int startY = Gdx.graphics.getHeight() - 100;
 
         bricks.clear();
+
+
+        Iterator<Brick> iterator = bricks.iterator();
+        while (iterator.hasNext()){
+            Brick brick = iterator.next(); iterator.remove();
+        }
 
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
