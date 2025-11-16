@@ -20,6 +20,4 @@ public class BackgroundManagement {
     public void render() {
         sprite.draw(spriteBatch);
     }
-
 }
-

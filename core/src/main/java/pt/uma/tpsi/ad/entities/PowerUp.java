@@ -4,15 +4,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import pt.uma.tpsi.ad.game.Animator;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PowerUp {
-    public enum Type {FAST_BALL }
+    public enum Type { FAST_BALL, FAST_PADDLE }
 
     private final Animator animator;
-    private int x, y;
+    private final int x;
+    private int y;
     private final Rectangle boundingBox;
     private final Type type;
     private boolean remove = false;
-    private float fallSpeed = 3; // velocidade inicial a cair
+    private boolean active = false;
+    private Timer timer;
 
     public PowerUp(SpriteBatch batch, int x, int y, Type type) {
         this.animator = new Animator(batch, "ship.png", 5, 2);
@@ -26,21 +31,42 @@ public class PowerUp {
     }
 
     public void update(float delta) {
-        // simples movimento descendente
-        y -= fallSpeed;
-        boundingBox.setPosition(x, y);
+        if (!remove && !active) {
+            y -= 3;
+            boundingBox.setPosition(x, y);
+        }
     }
 
     public void render() {
-        if (remove) return;
-        animator.render(x, y);
+        if (!remove) {
+            animator.render(x, y);
+        }
+    }
+
+    public void activate(Ball ball, Player player, long durationMs) {
+        if (active || remove) return;
+        active = true;
+        if (type == Type.FAST_BALL) {
+            ball.increaseSpeedY();
+        } else if (type == Type.FAST_PADDLE) {
+            player.increaseSpeedPlayer();
+        }
+        TimerTask task = new TimerTask() {
+            public void run() {
+                if (type == Type.FAST_BALL) {
+                    ball.resetSpeedY();
+                } else if (type == Type.FAST_PADDLE) {
+                    player.decreaseSpeedPlayer();
+                }
+                active = false;
+                remove = true;
+            }
+        };
+        timer = new Timer("PowerUpTimer", true);
+        timer.schedule(task, durationMs);
     }
 
     public Rectangle getBoundingBox() { return boundingBox; }
-
     public Type getType() { return type; }
-
-    public void markForRemove() { remove = true; }
-
     public boolean shouldRemove() { return remove || y + boundingBox.height < 0; }
 }

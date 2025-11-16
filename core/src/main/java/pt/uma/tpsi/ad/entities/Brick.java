@@ -10,24 +10,16 @@ public abstract class Brick {
     protected Rectangle boundingBox;
     protected boolean collided = false;
 
-    // compatibility constructor (single-frame sprite)
-    public Brick(SpriteBatch batch, String spritePath) {
-        this(batch, spritePath, 2,1,0,0); // inicializa temporariamente em (0,0)
-    }
-
-    // sprite-sheet aware constructor
     public Brick(SpriteBatch batch, String spritePath, int cols, int rows, int x, int y){
         this.animator = new Animator(batch, spritePath, cols, rows);
         this.posX = x;
         this.posY = y;
-        // initialize animator and bounding box immediately
         animator.create();
         int w = Math.max(1, animator.getWidth());
         int h = Math.max(1, animator.getHeight());
         this.boundingBox = new Rectangle(posX, posY, w, h);
     }
 
-    // Renderiza o brick no ecrã
     public void render() {
         if (boundingBox != null) {
             animator.render(posX, posY, (int) boundingBox.width, (int) boundingBox.height);
@@ -47,9 +39,16 @@ public abstract class Brick {
         return collided;
     }
 
-    // Cada tipo de brick implementa o comportamento da colisão
+
+    public void setPosition(int x, int y) {
+        this.posX = x;
+        this.posY = y;
+        if (this.boundingBox != null) {
+            this.boundingBox.setPosition(x, y);
+        }
+    }
+
     public abstract void onCollision();
 
-    // Pontos obtidos ao destruir este brick (subclasses podem sobrescrever)
     public int getPoints() { return 0; }
 }
