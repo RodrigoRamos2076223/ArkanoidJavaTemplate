@@ -102,7 +102,7 @@ public class BrickGrid {
             }
         }
 
-        // limpar explosões simples
+        // limpar explosões
         Iterator<Explosion> expIt = explosions.iterator();
         while (expIt.hasNext()) {
             Explosion e = expIt.next();
@@ -111,7 +111,7 @@ public class BrickGrid {
             }
         }
 
-        // atualizar powerUps
+        // atualiza powerUps
         Iterator<PowerUp> pIt = powerUps.iterator();
         while (pIt.hasNext()) {
             PowerUp pu = pIt.next();
